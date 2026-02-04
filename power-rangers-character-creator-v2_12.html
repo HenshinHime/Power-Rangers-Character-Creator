@@ -4300,6 +4300,7 @@
                     const base = character.essence[e];
                     const total = finalEssence[e];
                     const bonus = total - base;
+                    const atTotalCap = character.level === 1 && totalFinalEssence >= expectedTotal;
                     return `
                         <div class="allocator-row">
                             <div class="allocator-label">
@@ -4308,8 +4309,8 @@
                             </div>
                             <div class="allocator-controls">
                                 <button class="allocator-btn" onclick="adjustEssence('${e}', -1)" ${base <= 1 ? 'disabled' : ''}>−</button>
-                                <div class="allocator-value">${base}${bonus > 0 ? ` ’ ${total}` : ''}</div>
-                                <button class="allocator-btn" onclick="adjustEssence('${e}', 1)" ${base >= 5 || remaining <= 0 ? 'disabled' : ''}>+</button>
+                                <div class="allocator-value">${base}${bonus > 0 ? ` → ${total}` : ''}</div>
+                                <button class="allocator-btn" onclick="adjustEssence('${e}', 1)" ${base >= 5 || remaining <= 0 || atTotalCap ? 'disabled' : ''}>+</button>
                             </div>
                         </div>
                     `;
@@ -4331,6 +4332,13 @@
                 const remaining = getEssencePoints(character.level) - spent;
 
                 if (delta > 0 && remaining <= 0) return;
+
+                // Check total essence cap (16 for level 1)
+                if (delta > 0 && character.level === 1) {
+                    const finalEssence = getFinalEssence();
+                    const currentTotal = Object.values(finalEssence).reduce((sum, val) => sum + val, 0);
+                    if (currentTotal >= GAME_DATA.essencePointsAtLevel1) return;
+                }
 
                 character.essence[essence] = newVal;
                 renderEssenceAllocator();
@@ -7735,16 +7743,10 @@ ${origin ? origin.benefit.description : ''}
          * @param {object} [data] - The game data (defaults to global 'GAME_DATA')
          */
         async function exportToPDF(char, data) {
-            // DEBUG: Alert to confirm function is called (remove after testing)
-            alert('PDF Export function called! Starting...');
-
             // Use global variables directly (they're in the same script scope)
             // Note: 'character' and 'GAME_DATA' are declared earlier in this script
             const charData = char || character || {};
             const gameData = data || GAME_DATA || {};
-
-            // Debug: show character info
-            alert('Character name: ' + (charData.name || 'unnamed') + ', Origin: ' + (charData.origin || 'none'));
 
             try {
                 // Check if PDFLib is available
