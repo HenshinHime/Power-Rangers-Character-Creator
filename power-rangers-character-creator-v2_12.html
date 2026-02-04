@@ -7737,25 +7737,26 @@ ${origin ? origin.benefit.description : ''}
         async function exportToPDF(char, data) {
             // DEBUG: Alert to confirm function is called (remove after testing)
             alert('PDF Export function called! Starting...');
-        
-            // Use global variables if not passed (for backward compatibility)
-            const character = char || (typeof window !== 'undefined' && window.character) || {};
-            const gameData = data || (typeof window !== 'undefined' && window.GAME_DATA) || {};
-        
-            // Debug: show that function was called
-            console.log('exportToPDF called', { character, gameData });
-        
+
+            // Use global variables directly (they're in the same script scope)
+            // Note: 'character' and 'GAME_DATA' are declared earlier in this script
+            const charData = char || character || {};
+            const gameData = data || GAME_DATA || {};
+
+            // Debug: show character info
+            alert('Character name: ' + (charData.name || 'unnamed') + ', Origin: ' + (charData.origin || 'none'));
+
             try {
                 // Check if PDFLib is available
                 if (typeof PDFLib === 'undefined') {
                     pdfNotify('PDF library is loading. Please wait and try again.', 'warning');
                     return;
                 }
-        
+
                 console.log('PDFLib loaded, decoding embedded template...');
-        
+
                 const { PDFDocument } = PDFLib;
-        
+
                 // Decode the embedded base64 PDF template
                 const binaryString = atob(PDF_TEMPLATE_BASE64);
                 const len = binaryString.length;
@@ -7770,19 +7771,19 @@ ${origin ? origin.benefit.description : ''}
         
                 // Get the form
                 const form = pdfDoc.getForm();
-        
+
                 // Fill the form fields
-                await fillBasicInfo(form, character, gameData);
-                await fillEssenceAndDefenses(form, character, gameData);
-                await fillSkills(form, character, gameData);
-                await fillAttacks(form, character, gameData);
-                await fillPage2(form, character, gameData);
-                await fillZord(form, character, gameData);
-                await fillWeaponsAndArmor(form, character, gameData);
-        
+                await fillBasicInfo(form, charData, gameData);
+                await fillEssenceAndDefenses(form, charData, gameData);
+                await fillSkills(form, charData, gameData);
+                await fillAttacks(form, charData, gameData);
+                await fillPage2(form, charData, gameData);
+                await fillZord(form, charData, gameData);
+                await fillWeaponsAndArmor(form, charData, gameData);
+
                 // Save and download
                 const pdfBytes = await pdfDoc.save();
-                downloadPDF(pdfBytes, character.name || 'Character');
+                downloadPDF(pdfBytes, charData.name || 'Character');
         
                 pdfNotify('Character sheet PDF generated!', 'success');
         
