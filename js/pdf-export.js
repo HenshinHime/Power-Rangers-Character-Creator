@@ -162,6 +162,9 @@ function pdfNotify(message, type = 'info') {
  * @param {object} [data] - The game data (defaults to global 'GAME_DATA')
  */
 async function exportToPDF(char, data) {
+    // DEBUG: Alert to confirm function is called (remove after testing)
+    alert('PDF Export function called! Starting...');
+
     // Use global variables if not passed (for backward compatibility)
     const character = char || (typeof window !== 'undefined' && window.character) || {};
     const gameData = data || (typeof window !== 'undefined' && window.GAME_DATA) || {};
