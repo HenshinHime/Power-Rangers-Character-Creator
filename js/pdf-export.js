@@ -140,10 +140,14 @@ const SKILL_SPEC_MAP = {
 
 /**
  * Exports the character to a filled PDF.
- * @param {object} character - The character data object
- * @param {object} gameData - The game data (GAME_DATA object)
+ * @param {object} [char] - The character data object (defaults to global 'character')
+ * @param {object} [data] - The game data (defaults to global 'GAME_DATA')
  */
-async function exportToPDF(character, gameData) {
+async function exportToPDF(char, data) {
+    // Use global variables if not passed (for backward compatibility)
+    const character = char || (typeof window !== 'undefined' && window.character) || {};
+    const gameData = data || (typeof window !== 'undefined' && window.GAME_DATA) || {};
+
     try {
         // Check if PDFLib is available
         if (typeof PDFLib === 'undefined') {

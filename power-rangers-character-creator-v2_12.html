@@ -87,7 +87,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Power Rangers RPG - Character Creator</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- External CSS (optional - inline styles preserved below for compatibility) -->
+    <!-- <link rel="stylesheet" href="css/styles.css"> -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- Modular JavaScript files -->
+    <script src="js/constants.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pdf-export.js"></script>
     <style>
         /* STYLES */
         :root {
@@ -7157,6 +7163,7 @@ ${origin ? origin.benefit.description : ''}
             window.print();
         }
 
+        /* DISABLED: Using new pdf-export.js module instead
         // ===== PDF EXPORT WITH EMBEDDED CHARACTER SHEETS =====
 
         // Embedded character sheet images as base64
@@ -7575,6 +7582,7 @@ ${origin ? origin.benefit.description : ''}
                 alert('Error generating PDF: ' + error.message + '\n\nCheck the browser console for details.');
             }
         }
+        */
         // INITIALIZATION - Application Startup
         // Load saved data and render initial view
         document.addEventListener('DOMContentLoaded', () => {
