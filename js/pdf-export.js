@@ -135,6 +135,23 @@ const SKILL_SPEC_MAP = {
 };
 
 // =============================================================================
+// HELPER FUNCTION (fallback if utils.js not loaded)
+// =============================================================================
+
+/**
+ * Shows a notification - uses showNotification if available, otherwise alert
+ */
+function pdfNotify(message, type = 'info') {
+    if (typeof showNotification === 'function') {
+        showNotification(message, type);
+    } else if (type === 'error' || type === 'warning') {
+        alert(message);
+    } else {
+        console.log('[PDF Export]', message);
+    }
+}
+
+// =============================================================================
 // MAIN EXPORT FUNCTION
 // =============================================================================
 
@@ -148,24 +165,30 @@ async function exportToPDF(char, data) {
     const character = char || (typeof window !== 'undefined' && window.character) || {};
     const gameData = data || (typeof window !== 'undefined' && window.GAME_DATA) || {};
 
+    // Debug: show that function was called
+    console.log('exportToPDF called', { character, gameData });
+
     try {
         // Check if PDFLib is available
         if (typeof PDFLib === 'undefined') {
-            showNotification('PDF library is loading. Please wait and try again.', 'warning');
+            pdfNotify('PDF library is loading. Please wait and try again.', 'warning');
             return;
         }
 
-        showNotification('Generating PDF...', 'info', 1500);
+        console.log('PDFLib loaded, fetching template...');
 
         const { PDFDocument } = PDFLib;
 
         // Fetch the template PDF
         const templateUrl = PDF_TEMPLATE_PATH;
+        console.log('Fetching:', templateUrl);
         const response = await fetch(templateUrl);
 
         if (!response.ok) {
             throw new Error(`Failed to load PDF template: ${response.status}`);
         }
+
+        console.log('Template loaded, processing...');
 
         const templateBytes = await response.arrayBuffer();
         const pdfDoc = await PDFDocument.load(templateBytes);
@@ -186,11 +209,11 @@ async function exportToPDF(char, data) {
         const pdfBytes = await pdfDoc.save();
         downloadPDF(pdfBytes, character.name || 'Character');
 
-        showNotification('Character sheet PDF generated!', 'success');
+        pdfNotify('Character sheet PDF generated!', 'success');
 
     } catch (error) {
         console.error('PDF export error:', error);
-        showNotification('Error generating PDF: ' + error.message, 'error');
+        pdfNotify('Error generating PDF: ' + error.message, 'error');
     }
 }
 
